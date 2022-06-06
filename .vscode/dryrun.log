@@ -1,0 +1,11 @@
+mkdir -p /home/rajdeepchauhan/projects/memcached-operator/bin
+ 
+GOBIN=/home/rajdeepchauhan/projects/memcached-operator/bin go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.8.0
+ 
+/home/rajdeepchauhan/projects/memcached-operator/bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+go fmt ./...
+go vet ./...
+ 
+go build -o bin/manager main.go
+make: Leaving directory '/home/rajdeepchauhan/projects/memcached-operator'
+ 
