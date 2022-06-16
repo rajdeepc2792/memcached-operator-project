@@ -1,7 +1,6 @@
 # memcached-operator
 Test Openshift Pipline integration to project for POC on performing build, deploy & integration tests on existing operator.
 
-
 ## Description
 // TODO(user): An in-depth paragraph about your project and overview of use
 
