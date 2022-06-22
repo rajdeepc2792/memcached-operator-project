@@ -24,14 +24,12 @@ spec:
       labels:
         control-plane: controller-manager
     spec:
-      securityContext:
-        runAsNonRoot: true
       containers:
       - command:
         - /manager
         args:
         - --leader-elect
-        image: controller:latest
+        image: docker.io/neoairavataproject/memcached-operator:latest
         name: manager
         securityContext:
           allowPrivilegeEscalation: false

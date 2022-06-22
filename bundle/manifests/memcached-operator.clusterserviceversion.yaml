@@ -139,7 +139,7 @@ spec:
                 - --leader-elect
                 command:
                 - /manager
-                image: neoairavataproject/memcached-operator:v0.0.1
+                image: docker.io/neoairavataproject/memcached-operator:latest
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -162,8 +162,6 @@ spec:
                     memory: 64Mi
                 securityContext:
                   allowPrivilegeEscalation: false
-              securityContext:
-                runAsNonRoot: false
               serviceAccountName: memcached-operator-controller-manager
               terminationGracePeriodSeconds: 10
       permissions:
