@@ -1,0 +1,55 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-and-push-docker-image
+  namespace: cicd
+spec:
+  params:
+    - name: SECRET_NAME
+    - name: DOCKERFILE
+      default: ./Dockerfile
+    - name: IMAGE_NAME
+  workspaces:
+    - name: output
+  steps:
+    - name: build
+      image: 'quay.io/buildah/stable:v1.17.0'
+      workingDir: /workspace/output/
+      script: |
+        buildah --storage-driver=vfs bud --no-cache -f $(params.DOCKERFILE) -t $(params.IMAGE_NAME) .
+      volumeMounts:
+        - name: varlibcontainers
+          mountPath: /var/lib/containers
+      env:
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: $(params.SECRET_NAME)
+              key: username
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: $(params.SECRET_NAME)
+              key: password
+    - name: push
+      image: 'quay.io/buildah/stable:v1.17.0'
+      workingDir: /workspace/output/
+      script: |
+        buildah --storage-driver=vfs push --creds ${USERNAME}:${PASSWORD} $(params.IMAGE_NAME)
+      volumeMounts:
+        - name: varlibcontainers
+          mountPath: /var/lib/containers
+      env:
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: $(params.SECRET_NAME)
+              key: username
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: $(params.SECRET_NAME)
+              key: password
+  volumes:
+    - name: varlibcontainers
+      emptyDir: {}

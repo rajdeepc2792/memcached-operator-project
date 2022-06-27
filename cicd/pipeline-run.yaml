@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1 
+kind: PipelineRun 
+metadata:
+  generateName: pipeline-test-run-
+  namespace: cicd
+spec:
+  serviceAccountName: test-pipelines
+  pipelineRef:
+    name: test-pipeline
+  params:
+  - name: git-url
+    value: "https://github.com/rajdeepc2792/memcached-operator-project"
+  - name: git-revision
+    value: master
+  - name: commit-version
+    value: gama2
+  workspaces:
+  - name: cicd3
+    persistentVolumeClaim:
+      claimName: cicd-pvc8

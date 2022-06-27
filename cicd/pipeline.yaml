@@ -1,0 +1,132 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: test-pipeline
+  namespace: cicd
+spec:
+  workspaces: 
+    - name: cicd3
+  params:
+    - default: 'https://github.com/rajdeepc2792/memcached-operator-project'
+      name: git-url
+      type: string
+    - default: master
+      name: git-revision
+      type: string
+    - name: commit-version
+      type: string
+      default: alpha
+  tasks:
+    - name: fetch-repository
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: subdirectory
+          value: ''
+        - name: deleteExisting
+          value: 'true'
+        - name: revision
+          value: $(params.git-revision)
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: cicd3
+    - name: build-new-version
+      params:
+        - name: VERSION
+          value: $(params.commit-version)
+      taskRef:
+        kind: Task
+        name: build-new-version
+      runAfter:
+        - fetch-repository
+      workspaces:
+        - name: output
+          workspace: cicd3
+    - name: build-and-push-docker-image
+      taskRef:
+        kind: Task
+        name: build-and-push-docker-image
+      runAfter:
+        - build-new-version
+      params:
+        - name: SECRET_NAME
+          value: operator-docker-secrets
+        - name: DOCKERFILE
+          value: ./Dockerfile
+        - name: IMAGE_NAME
+          value: docker.io/neoairavataproject/memcached-operator:latest
+      workspaces:
+        - name: output
+          workspace: cicd3
+    - name: build-new-bundle
+      params:
+        - name: VERSION
+          value: $(params.commit-version)
+        - name: IMAGE_NAME
+          value: docker.io/neoairavataproject/memcached-operator:latest
+      taskRef:
+        kind: Task
+        name: build-new-bundle
+      runAfter:
+        - build-and-push-docker-image
+      workspaces:
+        - name: output
+          workspace: cicd3
+    - name: build-and-push-bundle-image
+      taskRef:
+        kind: Task
+        name: build-and-push-docker-image
+      runAfter:
+        - build-new-bundle
+      params:
+        - name: SECRET_NAME
+          value: operator-docker-secrets
+        - name: DOCKERFILE
+          value: bundle.Dockerfile
+        - name: IMAGE_NAME
+          value: docker.io/neoairavataproject/memcached-operator-bundle:latest
+      workspaces:
+        - name: output
+          workspace: cicd3
+    - name: build-new-catalog
+      params:
+        - name: BUNDLE_IMAGE_NAME
+          value: docker.io/neoairavataproject/memcached-operator-bundle:latest
+        - name: INDEX_IMAGE_NAME
+          value: docker.io/neoairavataproject/memcached-operator-index:v0.0.1
+      taskRef:
+        kind: Task
+        name: build-new-catalog
+      runAfter:
+        - build-and-push-bundle-image
+      workspaces:
+        - name: output
+          workspace: cicd3
+    - name: build-and-push-catalog-image
+      taskRef:
+        kind: Task
+        name: build-and-push-docker-image
+      runAfter:
+        - build-new-catalog
+      params:
+        - name: SECRET_NAME
+          value: operator-docker-secrets
+        - name: DOCKERFILE
+          value: ./catalog.Dockerfile
+        - name: IMAGE_NAME
+          value: docker.io/neoairavataproject/memcached-operator-index:v0.0.1
+      workspaces:
+        - name: output
+          workspace: cicd3
+    - name: get-memcached-operator-version
+      taskRef:
+        kind: Task
+        name: get-memcached-operator-version
+      runAfter:
+        - build-and-push-catalog-image
+      workspaces:
+        - name: output
+          workspace: cicd3

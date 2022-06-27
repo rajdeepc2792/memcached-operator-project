@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-new-version
+  namespace: cicd
+spec:
+  params:
+    - name: VERSION
+  steps:
+    - command:
+        - '/bin/bash'
+        - '-c'
+      args:
+        - |-
+          export CGO_ENABLED=0
+          make generate VERSION=0.0.1-$(params.VERSION)
+          make manifests VERSION=0.0.1-$(params.VERSION)
+      image: 'quay.io/operator-framework/operator-sdk:master'
+      resources: {}
+      workingDir: /workspace/output/
+  workspaces:
+    - name: output

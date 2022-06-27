@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-new-catalog
+  namespace: cicd
+spec:
+  params:
+    - name: BUNDLE_IMAGE_NAME
+    - name: INDEX_IMAGE_NAME
+  workspaces:
+    - name: output
+  steps:
+    - image: 'quay.io/operator-framework/operator-sdk:master'
+      workingDir: /workspace/output/
+      command:
+        - '/bin/bash'
+        - '-c'
+      args:
+        - |-
+          make catalog-build CATALOG_IMG=$(params.INDEX_IMAGE_NAME) BUNDLE_IMGS=$(params.BUNDLE_IMAGE_NAME)

@@ -1,0 +1,12 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: memcached-operator-registry
+  namespace: memcached-operator
+spec:
+  displayName: memcached-operator-registry
+  image: docker.io/neoairavataproject/memcached-operator-index:v0.0.1
+  sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 15m0s

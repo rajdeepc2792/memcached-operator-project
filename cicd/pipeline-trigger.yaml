@@ -1,0 +1,63 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: pipe-trigger
+  namespace: cicd
+spec:
+  params:
+  - name: gitrevision
+    value: master
+  - name: gitrepositoryurl
+    value: https://github.com/rajdeepc2792/memcached-operator-project
+  - name: commitversion
+    value: $(body.commits.tree_id)
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: pipeline-event-listener
+  namespace: cicd
+spec:
+  serviceAccountName: test-pipelines
+  triggers:
+    - name: pipe-listener
+      bindings:
+      - ref: pipe-trigger
+      template:
+        ref: pipe-trigger-template
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: pipe-trigger-template
+  namespace: cicd
+spec:
+  params:
+  - name: gitrevision
+    default: master
+  - name: gitrepositoryurl
+    default: https://github.com/rajdeepc2792/memcached-operator-project
+  - name: commitversion
+    default: alpha
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun 
+    metadata:
+      name: test-pipeline-run-$(uid)
+      namespace: cicd
+    spec:
+      timeout: 30m
+      serviceAccountName: test-pipelines
+      pipelineRef:
+        name: test-pipeline
+      params:
+      - name: git-revision
+        value: $(tt.params.gitrevision)
+      - name: git-url
+        value: $(tt.params.gitrepositoryurl)
+      - name: commit-version
+        value: $(tt.params.commitversion)
+      workspaces: 
+      - name: cicd3
+        persistentVolumeClaim:
+          claimName: cicd-pvc8

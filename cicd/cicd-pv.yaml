@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cicd-pv8-volume
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+    - ReadOnlyMany
+  hostPath:
+    path: "/mnt/pv-data/cicd"
+  persistentVolumeReclaimPolicy: Delete
+  volumeMode: Filesystem
