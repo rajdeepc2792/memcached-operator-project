@@ -9,7 +9,7 @@ Additionally, We also plan to discuss existing pipeline setup around RH GitHub p
 I plan to break the learning into 5 parts(Last 2 parts deal with RH Internal pipeline configurations):-
 
 1. [Operator Initialisation and Setup.](./docs/Operator-Init.md)
-2. [Operator Lifecycle Manager setup for Demo Operator. (In Progress)]
+2. [Operator Lifecycle Manager setup for Demo Operator.](docs/OLM-setup.md)
 3. [CICD Pipeline using Tekton setup for Operator Image and Catalog update. (In Progress)]
 4. [App-Interface's CICD pipeline setup for RH Operator/Project. (In Progress)]
 5. [Prow CI pipeline setup in openshift/release repo for RH projects. (In Progress)]

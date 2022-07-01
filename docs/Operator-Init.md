@@ -169,6 +169,10 @@ For this demo we used [Operator Framework SDK](https://operatorframework.io/)
 
     **It is recommended to have a one to one mapping between a controller and an API to manage**
 
+    Here is the architecture the KubeBuilder, which is used by Operator Framework for scaffolding boilerplate, tries to create for an operational controller:-
+
+    ![KubeBuilder Boiler-Plate architecture](./book.kubebuilder.io_architecture.html.png)
+
 6. At this point we are ready to modify the scaffolded kind type file according to our requirements to add actual fields the CR might contain.
 
     We do not plan to go into deep for the changes, but here are some basic changes we perform in our operator:-
@@ -248,7 +252,7 @@ For this demo we used [Operator Framework SDK](https://operatorframework.io/)
 
 ## Next
 
-We are using operator-sdk to deploy the bundle here, but the standard way to deploy Operator is via using the OLM mechanisms. We will cover OLM in the next chapter.
+We are using operator-sdk to deploy the bundle here, but the robust way to deploy Operator is via using the OLM mechanisms. We will cover OLM in the next chapter.
 
 ## References
 - https://developers.redhat.com/blog/2021/02/08/deploying-kubernetes-operators-with-operator-lifecycle-manager-bundles#
